@@ -1,16 +1,15 @@
 import React from 'react';
 import axios from 'axios';
+import Forecast from './Forecast';
 
 class App extends React.Component {
   state = {
-    isLoading: true,
-    forecast: {}
+    forecast: [],
+    city: 'undefined'
   };
   getData = async () => {
-    let city = 'busan';
-    const data = await axios.get(`http://localhost:4000/weather/${city}`);
+    const forecast = await axios.get(`http://localhost:4000/weather/busan`);
 
-    console.log(data);
     // console.log(data.data.city.name);
     // for (let d of weatherData) {
     //   let time = new Date(d.dt * 1000);
@@ -21,6 +20,8 @@ class App extends React.Component {
     //   d.main.feels_like = Math.floor(d.main.feels_like - 274.0);
     //   // d.main.weather[0].main = d.main.weather[0].main;
     // }
+    this.setState({ forecast: forecast.data, isLoading: false });
+    console.log(this.state.forecast[0]);
   };
 
   componentDidMount() {
@@ -28,8 +29,21 @@ class App extends React.Component {
   }
 
   render() {
-    const { isLoading } = this.state;
-    return <div>{isLoading ? 'Loading..' : 'We are Ready'}</div>;
+    const { forecast } = this.state;
+    return (
+      <div>
+        {forecast.map((f) => {
+          return (
+            <Forecast
+              _id={f.id}
+              time={f.time}
+              temp={f.temp}
+              feels_like={f.feels_like}
+            />
+          );
+        })}
+      </div>
+    );
   }
 }
 

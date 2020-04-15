@@ -17,10 +17,10 @@ function Forecast({ id, time, temp, feels_like, image, weather }) {
         }
       }}
     >
-      <div className="forecast">
+      <div className="forecasts">
         <img src={image} alt={time} title={time} className="forecast_image" />
         <div className="forcast_data">
-          <h2 className="forecast_time">시 간 :{time}</h2>
+          <h3 className="forecast_time">시 간 :{time}</h3>
           <h3 className="forecast_weather">날 씨 : {weather}</h3>
           <h3 className="forecast_weather">온 도 :{temp}</h3>
           <h3 className="forecast_weather">체감 온도 : {feels_like}</h3>

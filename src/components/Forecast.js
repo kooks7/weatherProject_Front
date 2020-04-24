@@ -2,27 +2,58 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import * as reactIcon from 'react-icons/wi';
 
 const Container = styled.div`
-  display: flex;
+  background-color: rgba(102, 000, 051, 0.5);
+  /* display: flex; */
+  height: 70%;
+  background-size: contain;
+  background-position: top;
+  background: cover;
 `;
-const Icon = styled.div`
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: white;
+  &:focus,
+  &:hover,
+  &:visited,
+  &:link,
+  &:active {
+    text-decoration: none;
+  }
+`;
+
+const Idiv = styled.div`
+  font-size: 5em;
+`;
+const Time = styled.h2`
+  font-size: 20px;
+`;
+const Temp = styled.h3`
   font-size: 32px;
 `;
-const Time = styled.h1`
-  font-size: 32px;
-`;
-const Temp = styled.h2`
-  font-size: 32px;
-`;
-const Condition = styled.h2`
+const Condition = styled.h3`
   font-size: 32px;
 `;
 
 const Forecast = ({ id, time, temp, condition }) => {
+  // condition 에러 처리 없으면 우선 Clear로 해놓기
+  if (!weatherOptions[condition]) {
+    condition = 'Clear';
+  }
+  const Icon = reactIcon[weatherOptions[condition].iconName];
+  // 시간 처리
+  const timeData = new Date(time * 1000);
+  console.log(timeData.toLocaleTimeString().split(':'));
+  const timeObj = {
+    Month: timeData.getMonth() + 1,
+    Date: timeData.getDate(),
+    Time: timeData.toLocaleTimeString().split(':')
+  };
   return (
     <Container>
-      <Link
+      <StyledLink
         to={{
           pathname: `/forecast/${id}`,
           state: {
@@ -32,11 +63,13 @@ const Forecast = ({ id, time, temp, condition }) => {
           }
         }}
       >
-        <Time>{time}</Time>
-        <Icon></Icon>
+        <Time>{timeObj.Time[0] + ':' + timeObj.Time[2]}</Time>
+        <Idiv>
+          <Icon />
+        </Idiv>
         <Temp>{temp}</Temp>
-        <Condition>{condition}</Condition>
-      </Link>
+        <Condition>{weatherOptions[condition].kor}</Condition>
+      </StyledLink>
     </Container>
   );
 };
@@ -46,6 +79,44 @@ Forecast.propType = {
   time: PropTypes.number.isRequired,
   temp: PropTypes.number.isRequired,
   condition: PropTypes.string.isRequired
+};
+
+const weatherOptions = {
+  Thunderstorm: {
+    iconName: 'WiNightAltSleetStorm',
+    kor: '천둥번개',
+    subtitle: '벼락을 조심하세요'
+  },
+  Drizzle: {
+    iconName: 'WiDayHail',
+    kor: '이슬비',
+    subtitle: '부슬부슬 이슬비'
+  },
+  Rain: {
+    iconName: 'WiUmbrella',
+    kor: '비',
+    subtitle: '비가 내립니다'
+  },
+  Snow: {
+    iconName: 'WiSnowWind',
+    kor: '눈',
+    subtitle: '하늘에서 눈이옵니다.'
+  },
+  Haze: {
+    iconName: 'WiDust',
+    kor: '미세먼지',
+    subtitle: '마스크를 꼭 착용하세요.'
+  },
+  Clear: {
+    iconName: 'WiSunset',
+    kor: '맑음',
+    subtitle: '날씨가 정말 맑아요.'
+  },
+  Clouds: {
+    iconName: 'WiCloud',
+    kor: '구름',
+    subtitle: '구름낀 날씨입니다.'
+  }
 };
 
 export default Forecast;

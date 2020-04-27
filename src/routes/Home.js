@@ -8,7 +8,7 @@ class Home extends Component {
     forecastData: {}
   };
 
-  componentDidMount() {
+  getWeather = () => {
     const graphqlQuery = {
       query: `
             {
@@ -50,6 +50,20 @@ class Home extends Component {
       .catch((err) => {
         console.log(err);
       });
+  };
+
+  // 옷 가져오는 함수
+  getClothes = () => {
+    // 1. 해당 온도 가져오기
+    // 2. 온도 붙여서 쿼리 보내주기
+    // 3. 쿼리 결과 받아와서 type별로 정렬하기
+    // 4. 렌더링 하기
+  };
+  // 검색 기능
+  citySearching = () => {};
+
+  componentDidMount() {
+    this.getWeather();
   }
 
   render() {
@@ -78,6 +92,8 @@ class Home extends Component {
                     time={f.time}
                     temp={f.temp}
                     condition={f.condition}
+                    city={normalData.city}
+                    feels_like={f.feels_like}
                   />
                 </div>
               ))}
@@ -104,18 +120,21 @@ body{
       rgba(20, 20, 20, 0.125) 70%,
       rgba(20, 20, 20, 0.15)
     ),url(http://localhost:3000/sky.jpg);
-  background-size: cover;
-}
+    background-size : cover;
+    width: 90%;
+  }
 `;
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  height: 120%;
+  height: 100%;
 `;
 const Header = styled.div`
+  flex: 1;
   display: flex;
-  border: 1px solid black;
+  /* border: 1px solid black; */
+  align-items: baseline;
 `;
 const Headertemp = styled.h1`
   font-size: 5rem;
@@ -124,19 +143,26 @@ const Headertemp = styled.h1`
 `;
 const Location = styled.h1``;
 const Neck = styled.div`
-  border: 1px solid black;
+  /* border: 1px solid black; */
 `;
 const Body = styled.div`
-  border: 1px solid black;
+  flex: 2;
+  /* border: 1px solid black; */
   display: flex;
-  /* justify-items: space-between; */
+  /* justify-content: space-between; */
+  @media only screen and (max-width: 600px) {
+    flex-direction: column;
+  }
 `;
 
 const Footer = styled.div`
+  margin-top: auto;
+  flex: 1;
   display: flex;
-  border: 1px solid black;
+  /* border: 1px solid black; */
 `;
 const Nav = styled.div`
-  border: 1px solid black;
+  /* border: 1px solid black; */
 `;
+
 export default Home;

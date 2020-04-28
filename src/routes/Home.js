@@ -1,29 +1,54 @@
 import React, { Component } from 'react';
-import Forecast from '../components/Forecast';
 import styled, { createGlobalStyle } from 'styled-components';
+import openSocket from 'socket.io-client';
+
+import Forecast from '../components/Forecast';
+import ForecastDetail from '../components/ForecastDetail';
 
 class Home extends Component {
   state = {
     isLoading: true,
-    forecastData: {}
+    forecastData: {},
+    coord: {
+      latitude: undefined,
+      longitude: undefined
+    },
+    keyword: '',
+    searchedCity: ''
   };
 
-  getWeather = () => {
+  // 1. 함수 : 날씨 정보 가져오는 함수
+  getWeather = (
+    latitude = this.state.coord.latitude,
+    longitude = this.state.coord.longitude
+  ) => {
+    console.log('실행');
     const graphqlQuery = {
       query: `
+      query getWeatherByLocaiton($latitude: String!,$longitude: String! )
             {
-                getWeather(latitude:"37.4999", longitude:"127.0374") {
+                getWeather(latitude: $latitude, longitude: $longitude) {
                     city
                 gu
                 weathers{
+                  id
                   time
                   temp
                   feels_like
                   condition
+                  humidity
+                  wind_speed
+                  temp_min
+                  temp_max
+                  rain
                 }
               }
             }      
-                `
+                `,
+      variables: {
+        latitude: latitude,
+        longitude: longitude
+      }
     };
 
     fetch('http://localhost:4000/graphql', {
@@ -45,25 +70,130 @@ class Home extends Component {
           forecastData: resData.data.getWeather,
           isLoading: false
         });
-        console.log(this.state.forecastData);
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
-  // 옷 가져오는 함수
+  // 2. 함수 브라우저를 통해 위치 정보 가져오는 함수
+  getLocation = () => {
+    if (navigator.geolocation) {
+      // GPS를 지원하면
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          // alert('위치가 확인되었습니다');
+          this.setState({
+            coord: {
+              latitude: position.coords.latitude.toString(),
+              longitude: position.coords.longitude.toString()
+            }
+          });
+
+          // 날씨 정보 가져오기
+          this.getWeather(
+            position.coords.latitude.toString(),
+            position.coords.longitude.toString()
+          );
+        },
+        function (error) {
+          console.error(error);
+        },
+        {
+          enableHighAccuracy: false,
+          maximumAge: 0,
+          timeout: Infinity
+        }
+      );
+    } else {
+      alert('위치정보를 지원하지 않습니다');
+    }
+  };
+
+  // 3. 함수 : 옷 가져오는 함수
   getClothes = () => {
     // 1. 해당 온도 가져오기
     // 2. 온도 붙여서 쿼리 보내주기
     // 3. 쿼리 결과 받아와서 type별로 정렬하기
     // 4. 렌더링 하기
   };
-  // 검색 기능
-  citySearching = () => {};
+
+  // 4. 함수 : 검색 기능
+  citySearching = () => {
+    const graphqlQuery = {
+      query: `
+      query getSearchingCity($city: String! )
+            {
+                getCityId(city: $city) {
+                   name
+                   country,
+                   coord{
+                      lat
+                      lon
+                   }
+                }
+            }      
+                `,
+      variables: {
+        city: this.state.keyword
+      }
+    };
+
+    fetch('http://localhost:4000/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(graphqlQuery)
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((resData) => {
+        if (resData.errors) {
+          throw new Error('에러');
+        }
+
+        this.setState({
+          searchedCity: resData.data.getCityId[0].name,
+          coord: {
+            latitude: resData.data.getCityId[0].coord.lat,
+            longitude: resData.data.getCityId[0].coord.lon
+          }
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  // 5.함수 키워드 변경 감지 함수
+  keywordChange = (e) => {
+    let searchStr = e.target.value;
+    this.setState({ keyword: searchStr });
+  };
+
+  // 6. 도시 변경하기
+  selectCity = (e) => {
+    e.preventDefault();
+    this.setState({
+      searchedCity: ``
+    });
+    this.getWeather(this.state.coord.latitude, this.state.coord.longitude);
+    alert('위치가 변경되었습니다!');
+    console.log(this.state.coord);
+  };
 
   componentDidMount() {
-    this.getWeather();
+    if (!this.state.coord.latitude) {
+      this.getLocation();
+    }
+    const socket = openSocket('http://localhost:4000');
+  }
+  componentDidUpdate() {
+    if (!this.state.coord.latitude) {
+      console.log('update');
+    }
   }
 
   render() {
@@ -77,17 +207,19 @@ class Home extends Component {
         ) : (
           <Container>
             <GlobalStyle />
-            <Header>
-              <Headertemp>{forecasts[0].temp}°C</Headertemp>
-              <Location>{normalData.gu},</Location>
-              <Location>{normalData.city}</Location>
-            </Header>
-            <Neck>목 입니다</Neck>
+            <ForecastDetail
+              wind_speed={forecasts[0].wind_speed}
+              temp={forecasts[0].temp}
+              gu={normalData.gu}
+              city={normalData.city}
+              humidity={forecasts[0].humidity}
+              temp_max={forecasts[0].temp_max}
+              temp_min={forecasts[0].temp_min}
+            />
             <Body>
               {forecasts.map((f) => (
-                <div>
+                <div key={f.id}>
                   <Forecast
-                    key={f.time}
                     id={f.time}
                     time={f.time}
                     temp={f.temp}
@@ -101,7 +233,20 @@ class Home extends Component {
 
             <Footer>
               <Nav>네비게이션</Nav>
-              발입니다
+              What is your city?
+              <input type="text" onChange={this.keywordChange}></input>
+              <button onClick={this.citySearching}>search</button>
+              <div>
+                <h1>
+                  {this.state.searchedCity ? (
+                    <SearchRes onClick={this.selectCity}>
+                      {this.state.searchedCity}
+                    </SearchRes>
+                  ) : (
+                    ''
+                  )}
+                </h1>
+              </div>
             </Footer>
           </Container>
         )}
@@ -112,6 +257,7 @@ class Home extends Component {
 
 const GlobalStyle = createGlobalStyle`
 body{
+  position: relative;
   font-family: Nanum Gothic, sans-serif; 
   color: white;
   background: linear-gradient(
@@ -130,21 +276,7 @@ const Container = styled.div`
   flex-direction: column;
   height: 100%;
 `;
-const Header = styled.div`
-  flex: 1;
-  display: flex;
-  /* border: 1px solid black; */
-  align-items: baseline;
-`;
-const Headertemp = styled.h1`
-  font-size: 5rem;
-  padding-left: 20px;
-  padding-right: 20px;
-`;
-const Location = styled.h1``;
-const Neck = styled.div`
-  /* border: 1px solid black; */
-`;
+
 const Body = styled.div`
   flex: 2;
   /* border: 1px solid black; */
@@ -156,11 +288,23 @@ const Body = styled.div`
 `;
 
 const Footer = styled.div`
+  position: fixed;
+  color: black;
+  background-color: #f3f4f7;
+  left: 0;
+  bottom: 0px;
+  width: 100%;
+  height: 60px;
+  padding: 15px 0;
+  text-align: center;
   margin-top: auto;
   flex: 1;
   display: flex;
   /* border: 1px solid black; */
 `;
+
+const SearchRes = styled.a``;
+
 const Nav = styled.div`
   /* border: 1px solid black; */
 `;

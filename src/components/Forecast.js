@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import * as reactIcon from 'react-icons/wi';
@@ -17,32 +16,24 @@ const Container = styled.div`
   margin: 30px -30px 30px 40px;
   align-items: baseline;
 `;
-const StyledLink = styled(Link)`
-  text-decoration: none;
-  color: white;
-  &:focus,
-  &:hover,
-  &:visited,
-  &:link,
-  &:active {
-    text-decoration: none;
-  }
-`;
+
+const Link = styled.a``;
 
 const Idiv = styled.div`
-  font-size: 5em;
-  margin-bottom: -20px;
+  font-size: 6.5em;
+  margin-top: 20px;
 `;
 const Time = styled.h2`
   font-size: 20px;
 `;
 const Temp = styled.h3`
-  font-size: 25px;
+  font-size: 40x;
+  font-weight: 30;
 `;
 const Condition = styled.h3`
-  font-size: 25x;
+  font-size: 40x;
+  font-weight: 30;
 `;
-const Modal = styled.button``;
 
 class Forecast extends Component {
   state = {
@@ -69,22 +60,24 @@ class Forecast extends Component {
     const Icon = reactIcon[weatherOptions[condition].iconName];
     // 시간 처리
     const timeData = new Date(time * 1000);
-    console.log(timeData.toLocaleTimeString().split(':'));
     const timeObj = {
       Month: timeData.getMonth() + 1,
       Date: timeData.getDate(),
       Time: timeData.toLocaleTimeString().split(':')
     };
 
+    // <Modal onClick={this.handleOpenModal}>출격가능</Modal>
+
     return (
       <Container>
-        <Time>{timeObj.Time[0] + ':' + timeObj.Time[2]}</Time>
-        <Idiv>
-          <Icon />
-        </Idiv>
-        <Temp>{temp}°C</Temp>
-        <Condition>{weatherOptions[condition].kor}</Condition>
-        <Modal onClick={this.handleOpenModal}>열기</Modal>
+        <Link onClick={this.handleOpenModal}>
+          <Time>{timeObj.Time[0] + ':' + timeObj.Time[2]}</Time>
+          <Idiv>
+            <Icon />
+          </Idiv>
+          <Temp>{temp}°C</Temp>
+          <Condition>{weatherOptions[condition].kor}</Condition>
+        </Link>
         {this.state.modal && (
           <ModalPortal>
             <Detail

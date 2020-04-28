@@ -126,7 +126,7 @@ class Detail extends Component {
                 <ClothesItem>{d.name}</ClothesItem>
               </Clothes>
             ))}
-            <button onClick={onClose}>닫기</button>
+            <CloseBtn onClick={onClose}>Close</CloseBtn>
           </Modal>
         )}
       </div>
@@ -146,7 +146,7 @@ const Modal = styled.div`
   flex-direction: column;
 `;
 const Content = styled.div`
-  background: white;
+  background: rgba(200, 200, 200, 0.98);
   color: black;
   padding: 1rem;
   width: 400px;
@@ -154,12 +154,22 @@ const Content = styled.div`
 `;
 
 const Clothes = styled.div`
-  background: white;
+  background: rgba(200, 200, 200, 0.98);
   color: black;
   padding: 1rem;
   width: 400px;
   height: auto;
 `;
 const ClothesItem = styled.p``;
+
+const CloseBtn = styled.button`
+  font-size: 1em;
+  margin: 1em;
+  padding: 0.25em 1em;
+  border-radius: 3px;
+  background-color: rgba(051, 051, 051, 0.5);
+  color: rgba(220, 220, 220, 1);
+  border: 0px;
+`;
 
 export default Detail;

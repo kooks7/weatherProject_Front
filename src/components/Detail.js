@@ -105,7 +105,7 @@ class Detail extends Component {
   render() {
     if (!this.state.isLoading) {
     }
-    const { time, feels_like, onClose } = this.props;
+    const { time, feels_like, onClose, id } = this.props;
     const { isLoading } = this.state;
     console.log(typeof feels_like);
     return (
@@ -122,7 +122,7 @@ class Detail extends Component {
               <h4>{feels_like}</h4>
             </Content>
             {this.state.resData.data.getClothes.map((d) => (
-              <Clothes>
+              <Clothes key={d.name}>
                 <ClothesItem>{d.name}</ClothesItem>
               </Clothes>
             ))}

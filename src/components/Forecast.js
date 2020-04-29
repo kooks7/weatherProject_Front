@@ -81,6 +81,7 @@ class Forecast extends Component {
         {this.state.modal && (
           <ModalPortal>
             <Detail
+              id={id}
               onClose={this.handleCloseModal}
               time={timeObj.Time[0] + ':' + timeObj.Time[2]}
               temp={temp}

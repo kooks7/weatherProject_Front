@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
@@ -28,7 +28,15 @@ const ForecastDetail = ({
   );
 };
 
-export default ForecastDetail;
+ForecastDetail.propType = {
+  wind_speed: PropTypes.number.isRequired,
+  temp: PropTypes.number.isRequired,
+  gu: PropTypes.string.isRequired,
+  city: PropTypes.string.isRequired,
+  humidity: PropTypes.number.isRequired,
+  temp_max: PropTypes.number.isRequired,
+  temp_min: PropTypes.number.isRequired
+};
 
 const Header = styled.div`
   flex: 1;
@@ -46,3 +54,5 @@ const Neck = styled.div`
   display: flex;
 `;
 const WeatherDetail = styled.h3``;
+
+export default ForecastDetail;

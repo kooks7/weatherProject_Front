@@ -160,6 +160,7 @@ class Home extends Component {
                     time={f.time}
                     temp={f.temp}
                     condition={f.condition}
+                    gu={normalData.gu}
                     city={normalData.city}
                     feels_like={f.feels_like}
                   />
@@ -179,14 +180,13 @@ body{
   position: relative;
   font-family: Nanum Gothic, sans-serif; 
   color: white;
-  background: linear-gradient(
-      to right,
-      rgba(20, 20, 20, 0.1) 10%,
-      rgba(20, 20, 20, 0.125) 70%,
-      rgba(20, 20, 20, 0.15)
-    ),url(http://localhost:3000/sky.jpg);
-    background-size : cover;
-    width: 90%;
+  background: url(http://localhost:3000/sky.jpg);
+  background-size : cover;
+  height: 100%;
+  overflow: hidden;
+}
+  html{
+    height: 100vh;
   }
 `;
 

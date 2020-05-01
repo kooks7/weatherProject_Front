@@ -45,7 +45,8 @@ class Forecast extends Component {
       modal: true
     });
   };
-  handleCloseModal = () => {
+  handleCloseModal = (e) => {
+    console.log(e);
     this.setState({
       modal: false
     });
@@ -53,7 +54,7 @@ class Forecast extends Component {
 
   // condition 에러 처리 없으면 우선 Clear로 해놓기
   render() {
-    const { id, time, temp, condition, city, feels_like } = this.props;
+    const { id, time, temp, condition, city, gu, feels_like } = this.props;
     if (!weatherOptions[condition]) {
       this.props.condition = 'Clear';
     }
@@ -69,18 +70,22 @@ class Forecast extends Component {
     // <Modal onClick={this.handleOpenModal}>출격가능</Modal>
 
     return (
-      <Container>
-        <Link onClick={this.handleOpenModal}>
-          <Time>{timeObj.Time[0] + ':' + timeObj.Time[2]}</Time>
-          <Idiv>
-            <Icon />
-          </Idiv>
-          <Temp>{temp}°C</Temp>
-          <Condition>{weatherOptions[condition].kor}</Condition>
-        </Link>
+      <>
+        <Container onClick={this.handleOpenModal}>
+          <Link>
+            <Time>{timeObj.Time[0] + ':' + timeObj.Time[2]}</Time>
+            <Idiv>
+              <Icon />
+            </Idiv>
+            <Temp>{temp}°C</Temp>
+            <Condition>{weatherOptions[condition].kor}</Condition>
+          </Link>
+        </Container>
         {this.state.modal && (
           <ModalPortal>
             <Detail
+              gu={gu}
+              city={city}
               id={id}
               onClose={this.handleCloseModal}
               time={timeObj.Time[0] + ':' + timeObj.Time[2]}
@@ -89,7 +94,7 @@ class Forecast extends Component {
             />
           </ModalPortal>
         )}
-      </Container>
+      </>
     );
   }
 }

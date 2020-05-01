@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import { AppBar, Tabs, Tab } from '@material-ui/core';
+import TabPanel from './TabPanel';
 
 // const Detail = ({ time, feels_like, onClose }) => {
 //   const graphqlQuery = {
@@ -54,18 +56,19 @@ import styled from 'styled-components';
 class Detail extends Component {
   state = {
     isLoading: true,
-    resData: Array
+    resData: Array,
+    value: 0
   };
 
   getClothes = () => {
     const graphqlQuery = {
       query: `
-        query getClotesData($temp: Int!){
+        query getClotesData($temp: Float!){
             getClothes(temp: $temp) {
-              name
-              type
-              temp
-              level
+              outer{
+                name
+              }
+              
             }
           }      
     `,
@@ -92,22 +95,29 @@ class Detail extends Component {
           isLoading: false,
           resData: resData
         });
-        console.log(this.state.resData.data);
       })
       .catch((err) => {
         console.log(err);
       });
   };
-  componentDidMount() {
+
+  a11yProps = (index) => {
+    return {
+      id: `simple-tab-${index}`,
+      'aria-controls': `simple-tabpanel-${index}`
+    };
+  };
+  handleChange = (event, newValue) => {
+    this.setState({ value: newValue });
+  };
+
+  componentDidMount = () => {
     this.getClothes();
-  }
+  };
 
   render() {
-    if (!this.state.isLoading) {
-    }
-    const { time, feels_like, onClose, id } = this.props;
+    const { time, feels_like, onClose, city, gu } = this.props;
     const { isLoading } = this.state;
-    console.log(typeof feels_like);
     return (
       <div>
         {isLoading ? (
@@ -115,57 +125,103 @@ class Detail extends Component {
             <Modal> Loding ...</Modal>
           </div>
         ) : (
-          <Modal>
-            <Content>
-              <h3>hi</h3>
-              <h4>{time}</h4>
-              <h4>{feels_like}</h4>
-            </Content>
-            {this.state.resData.data.getClothes.map((d) => (
-              <Clothes key={d.name}>
-                <ClothesItem>{d.name}</ClothesItem>
+          <>
+            <ModalContainer onClick={onClose}></ModalContainer>
+            <Modal>
+              <Content>
+                <h4>{time}</h4>
+                <h3>{gu} ,</h3>
+                <h3>{city}의 현재 날씨</h3>
+                <h4> 체감온도: {feels_like}</h4>
+              </Content>
+
+              <Clothes>
+                <AppBar position="static">
+                  <Tabs
+                    value={this.state.value}
+                    onChange={this.handleChange}
+                    aria-label="simple tabs example"
+                  >
+                    <Tab label="Item One" {...this.a11yProps(0)} />
+                    <Tab label="Item Two" {...this.a11yProps(1)} />
+                    <Tab label="Item Three" {...this.a11yProps(2)} />
+                  </Tabs>
+                </AppBar>
+                <TabPanel value={this.state.value} index={0}>
+                  {this.state.resData.data.getClothes.outer.map((d) => {
+                    return <p>{d.name}</p>;
+                  })}
+                </TabPanel>
+                <TabPanel value={this.state.value} index={1}>
+                  {this.state.resData.data.getClothes.outer.map((d) => {
+                    return <p>{d.name}</p>;
+                  })}
+                </TabPanel>
+                <TabPanel value={this.state.value} index={2}>
+                  {this.state.resData.data.getClothes.outer.map((d) => {
+                    return <p>{d.name}</p>;
+                  })}
+                </TabPanel>
               </Clothes>
-            ))}
-            <CloseBtn onClick={onClose}>Close</CloseBtn>
-          </Modal>
+              <ModalCloseBtn onClick={onClose}>Close</ModalCloseBtn>
+            </Modal>
+          </>
         )}
       </div>
     );
   }
 }
-const Modal = styled.div`
-  background: rgba(0, 0, 0, 0.25);
-  position: fixed;
-  left: 0;
-  top: 0;
-  height: 100%;
+const ModalContainer = styled.div`
+  position: absolute;
+  top: 0%;
+  left: 0%;
   width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+`;
+const Modal = styled.div`
+  z-index: 1;
+  /* background: rgba(0, 0, 0, 0.25); */
+  position: absolute;
+  top: 50%;
+  left: 50%;
   display: flex;
-  align-items: center;
-  justify-content: center;
   flex-direction: column;
+  padding: 2em;
+  min-width: 20em;
+  max-width: 70%;
+  max-height: 60%;
+  color: black;
+  background-color: #fff;
+  border-radius: 1em;
+  transform: translate(-50%, -50%);
+  outline: transparent;
+
+  /* width: 50%; */
 `;
 const Content = styled.div`
-  background: rgba(200, 200, 200, 0.98);
-  color: black;
-  padding: 1rem;
-  width: 400px;
-  height: auto;
+  display: flex;
+  margin-bottom: 3px;
+  border-bottom: 0.5px solid rgba(200, 200, 200, 0.9);
 `;
 
 const Clothes = styled.div`
-  background: rgba(200, 200, 200, 0.98);
-  color: black;
-  padding: 1rem;
-  width: 400px;
-  height: auto;
+  /* display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-content: space-around;
+  max-height: 50%; */
 `;
 const ClothesItem = styled.p``;
 
-const CloseBtn = styled.button`
+const ModalCloseBtn = styled.button`
+  position: relative;
+  bottom: -80px;
   font-size: 1em;
   margin: 1em;
-  padding: 0.25em 1em;
+  padding: 5px;
   border-radius: 3px;
   background-color: rgba(051, 051, 051, 0.5);
   color: rgba(220, 220, 220, 1);

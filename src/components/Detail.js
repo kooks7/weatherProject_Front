@@ -142,9 +142,10 @@ class Detail extends Component {
                     onChange={this.handleChange}
                     aria-label="simple tabs example"
                   >
-                    <Tab label="Item One" {...this.a11yProps(0)} />
-                    <Tab label="Item Two" {...this.a11yProps(1)} />
-                    <Tab label="Item Three" {...this.a11yProps(2)} />
+                    <Tab label="Outer" {...this.a11yProps(0)} />
+                    <Tab label="Top" {...this.a11yProps(1)} />
+                    <Tab label="Bottom" {...this.a11yProps(2)} />
+                    <Tab label="Acc" {...this.a11yProps(3)} />
                   </Tabs>
                 </AppBar>
                 <TabPanel value={this.state.value} index={0}>
@@ -153,14 +154,13 @@ class Detail extends Component {
                   })}
                 </TabPanel>
                 <TabPanel value={this.state.value} index={1}>
-                  {this.state.resData.data.getClothes.outer.map((d) => {
-                    return <p>{d.name}</p>;
-                  })}
+                  이것은
                 </TabPanel>
                 <TabPanel value={this.state.value} index={2}>
-                  {this.state.resData.data.getClothes.outer.map((d) => {
-                    return <p>{d.name}</p>;
-                  })}
+                  옷!
+                </TabPanel>
+                <TabPanel value={this.state.value} index={3}>
+                  Acc
                 </TabPanel>
               </Clothes>
               <ModalCloseBtn onClick={onClose}>Close</ModalCloseBtn>

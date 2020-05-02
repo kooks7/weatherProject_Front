@@ -13,7 +13,6 @@ class TabPanel extends Component {
         {...this.props.other}
       >
         <Box p={3}>{this.props.children}</Box>
-        {console.log(this.props)}
       </Typography>
     );
   }

@@ -149,18 +149,33 @@ class Detail extends Component {
                   </Tabs>
                 </AppBar>
                 <TabPanel value={this.state.value} index={0}>
-                  {this.state.resData.data.getClothes.outer.map((d) => {
-                    return <p>{d.name}</p>;
-                  })}
+                  <ClothesItemContainer>
+                    {this.state.resData.data.getClothes.outer.map((d) => {
+                      return <ClothesItem>{d.name}</ClothesItem>;
+                    })}
+                  </ClothesItemContainer>
                 </TabPanel>
+
                 <TabPanel value={this.state.value} index={1}>
-                  이것은
+                  <ClothesItemContainer>
+                    {this.state.resData.data.getClothes.outer.map((d) => {
+                      return <ClothesItem>{d.name}</ClothesItem>;
+                    })}
+                  </ClothesItemContainer>
                 </TabPanel>
                 <TabPanel value={this.state.value} index={2}>
-                  옷!
+                  <ClothesItemContainer>
+                    {this.state.resData.data.getClothes.outer.map((d) => {
+                      return <ClothesItem>{d.name}</ClothesItem>;
+                    })}
+                  </ClothesItemContainer>
                 </TabPanel>
                 <TabPanel value={this.state.value} index={3}>
-                  Acc
+                  <ClothesItemContainer>
+                    {this.state.resData.data.getClothes.outer.map((d) => {
+                      return <ClothesItem>{d.name}</ClothesItem>;
+                    })}
+                  </ClothesItemContainer>
                 </TabPanel>
               </Clothes>
               <ModalCloseBtn onClick={onClose}>Close</ModalCloseBtn>
@@ -186,11 +201,10 @@ const Modal = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
-  display: flex;
-  flex-direction: column;
+  /* display: flex; */
+  /* flex-direction: column; */
   padding: 2em;
-  min-width: 20em;
-  max-width: 70%;
+  max-width: 50%;
   max-height: 60%;
   color: black;
   background-color: #fff;
@@ -214,7 +228,23 @@ const Clothes = styled.div`
   align-content: space-around;
   max-height: 50%; */
 `;
-const ClothesItem = styled.p``;
+const ClothesItemContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  max-width: 20rem;
+  max-height: 30rem;
+  justify-content: space-around;
+  align-content: space-around;
+  margin-left: 2rem;
+`;
+
+const ClothesItem = styled.p`
+  padding: 10px;
+  margin: 10px;
+  border: 0.5px solid rgba(200, 200, 200, 0.9);
+  border-radius: 3px;
+`;
 
 const ModalCloseBtn = styled.button`
   position: relative;

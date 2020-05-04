@@ -41,7 +41,6 @@ ForecastDetail.propType = {
 const Header = styled.div`
   flex: 1;
   display: flex;
-  /* border: 1px solid black; */
   align-items: baseline;
 `;
 const Headertemp = styled.h1`
@@ -53,6 +52,8 @@ const Location = styled.h1``;
 const Neck = styled.div`
   display: flex;
 `;
-const WeatherDetail = styled.h3``;
+const WeatherDetail = styled.h3`
+  margin: 10px;
+`;
 
 export default ForecastDetail;

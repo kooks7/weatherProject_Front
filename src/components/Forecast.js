@@ -54,7 +54,7 @@ class Forecast extends Component {
 
   // condition 에러 처리 없으면 우선 Clear로 해놓기
   render() {
-    const { id, time, temp, condition, city, gu, feels_like } = this.props;
+    const { id, time, temp, condition, city, country, feels_like } = this.props;
     if (!weatherOptions[condition]) {
       this.props.condition = 'Clear';
     }
@@ -84,7 +84,7 @@ class Forecast extends Component {
         {this.state.modal && (
           <ModalPortal>
             <Detail
-              gu={gu}
+              country={country}
               city={city}
               id={id}
               onClose={this.handleCloseModal}

@@ -26,6 +26,10 @@ class Foot extends Component {
                 getCityId(city: $city) {
                    name
                    country
+                   coord{
+                    lat
+                    lon
+                  }
                 }
             }      
                 `,
@@ -48,19 +52,16 @@ class Foot extends Component {
         if (resData.errors) {
           throw new Error('에러');
         }
+        console.log(resData);
         const {
           data: { getCityId }
         } = resData;
-        if (!getCityId[0]) {
+        if (!getCityId) {
           alert('검색한 도시가 없습니다.');
           return;
         }
-        let temp = [];
-        for (let i = 0; i < getCityId.length; i++) {
-          temp.push({ city: getCityId[i].name, country: getCityId[i].country });
-        }
         this.setState({
-          searchedCity: temp
+          searchedCity: getCityId
         });
         console.log(this.state);
       })
@@ -77,66 +78,75 @@ class Foot extends Component {
   handleCloseModal = () => {
     this.setState({
       modalFooter: false,
-      searchedCity: []
+      searchedCity: ''
     });
   };
 
   // 3. 클릭하면 도시 변경하기
   selectCity = (city, e) => {
-    console.log(city);
-    const graphqlQuery = {
-      query: `
-      query getSearchingCity($city: String! )
-            {
-                getCityId(city: $city) {
-                   coord{
-                     lat
-                     lon
-                   }
-                }
-            }      
-                `,
-      variables: {
-        city: city.city
-      }
-    };
+    this.setState({
+      searchedCity: []
+    });
+    this.props.getWeather(
+      this.state.searchedCity.coord.lat,
+      this.state.searchedCity.coord.lon
+    );
+    alert('위치가 변경되었습니다!');
 
-    // 1. 선택한 도시로 쿼리 보내기
-    fetch('http://localhost:4000/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(graphqlQuery)
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((resData) => {
-        if (resData.errors) {
-          throw new Error('에러');
-        }
-        if (!resData.data.getCityId[0]) {
-          alert('검색한 도시가 없습니다.');
-          return;
-        }
+    // console.log(city);
+    // const graphqlQuery = {
+    //   query: `
+    //   query getSearchingCity($city: String! )
+    //         {
+    //             getCityId(city: $city) {
+    //                coord{
+    //                  lat
+    //                  lon
+    //                }
+    //             }
+    //         }
+    //             `,
+    //   variables: {
+    //     city: city
+    //   }
+    // };
 
-        this.setState({
-          searchedCity: []
-          // coord: {
-          //   latitude: resData.data.getCityId[0].coord.lat,
-          //   longitude: resData.data.getCityId[0].coord.lon
-          // }
-        });
-        this.props.getWeather(
-          resData.data.getCityId[0].coord.lat,
-          resData.data.getCityId[0].coord.lon
-        );
-        alert('위치가 변경되었습니다!');
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    // // 1. 선택한 도시로 쿼리 보내기
+    // fetch('http://localhost:4000/graphql', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify(graphqlQuery)
+    // })
+    //   .then((res) => {
+    //     return res.json();
+    //   })
+    //   .then((resData) => {
+    //     if (resData.errors) {
+    //       throw new Error('에러');
+    //     }
+    //     if (!resData.data.getCityId) {
+    //       alert('검색한 도시가 없습니다.');
+    //       return;
+    //     }
+
+    //     this.setState({
+    //       searchedCity: ''
+    //       // coord: {
+    //       //   latitude: resData.data.getCityId[0].coord.lat,
+    //       //   longitude: resData.data.getCityId[0].coord.lon
+    //       // }
+    //     });
+    //     this.props.getWeather(
+    //       resData.data.getCityId.coord.lat,
+    //       resData.data.getCityId.coord.lon
+    //     );
+    //     alert('위치가 변경되었습니다!');
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   };
   render() {
     const { searchedCity } = this.state;
@@ -154,14 +164,15 @@ class Foot extends Component {
                 <Btn onClick={this.handleCloseModal}>Close</Btn>
               </SearchingBar>
               <div>
-                {searchedCity ? (
+                {searchedCity[0] ? (
                   <div>
                     <SearchList>
                       {searchedCity.map((d) => {
+                        console.log('d', d);
                         return (
                           <li>
                             <SearchRes onClick={(e) => this.selectCity(d, e)}>
-                              {d.city}-{d.country}
+                              {d.name}-{d.country}
                             </SearchRes>
                           </li>
                         );

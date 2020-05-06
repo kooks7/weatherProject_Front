@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 const ForecastDetail = ({
   wind_speed,
   temp,
-  gu,
+  country,
   city,
   humidity,
   temp_max,
@@ -15,8 +15,8 @@ const ForecastDetail = ({
     <>
       <Header>
         <Headertemp>{temp}°C</Headertemp>
-        <Location>{gu},</Location>
         <Location>{city}</Location>
+        <Location>, {country}</Location>
       </Header>
       <Neck>
         <WeatherDetail>습도 :{humidity}%</WeatherDetail>
@@ -31,7 +31,7 @@ const ForecastDetail = ({
 ForecastDetail.propType = {
   wind_speed: PropTypes.number.isRequired,
   temp: PropTypes.number.isRequired,
-  gu: PropTypes.string.isRequired,
+  country: PropTypes.string.isRequired,
   city: PropTypes.string.isRequired,
   humidity: PropTypes.number.isRequired,
   temp_max: PropTypes.number.isRequired,

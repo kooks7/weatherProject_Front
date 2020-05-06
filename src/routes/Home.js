@@ -29,7 +29,7 @@ class Home extends Component {
             {
                 getWeather(latitude: $latitude, longitude: $longitude) {
                     city
-                gu
+                    country
                 weathers{
                   id
                   time
@@ -146,8 +146,8 @@ class Home extends Component {
             <ForecastDetail
               wind_speed={forecasts[0].wind_speed}
               temp={forecasts[0].temp}
-              gu={normalData.gu}
               city={normalData.city}
+              country={normalData.country}
               humidity={forecasts[0].humidity}
               temp_max={forecasts[0].temp_max}
               temp_min={forecasts[0].temp_min}
@@ -160,8 +160,8 @@ class Home extends Component {
                     time={f.time}
                     temp={f.temp}
                     condition={f.condition}
-                    gu={normalData.gu}
                     city={normalData.city}
+                    country={normalData.country}
                     feels_like={f.feels_like}
                   />
                 </div>

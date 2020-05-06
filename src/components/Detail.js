@@ -9,7 +9,7 @@ import TabPanel from './TabPanel';
 //             {
 //                 getWeather(latitude:"37.4999", longitude:"127.0374") {
 //                     city
-//                 gu
+//                 country
 //                 weathers{
 //                   time
 //                   temp
@@ -116,7 +116,7 @@ class Detail extends Component {
   };
 
   render() {
-    const { time, feels_like, onClose, city, gu } = this.props;
+    const { time, feels_like, onClose, city, country } = this.props;
     const { isLoading } = this.state;
     return (
       <div>
@@ -130,7 +130,7 @@ class Detail extends Component {
             <Modal>
               <Content>
                 <h4>{time}</h4>
-                <h3>{gu} ,</h3>
+                <h3>{country} ,</h3>
                 <h3>{city}의 현재 날씨</h3>
                 <h4> 체감온도: {feels_like}</h4>
               </Content>

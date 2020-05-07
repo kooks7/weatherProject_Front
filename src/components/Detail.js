@@ -2,56 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { AppBar, Tabs, Tab } from '@material-ui/core';
 import TabPanel from './TabPanel';
-
-// const Detail = ({ time, feels_like, onClose }) => {
-//   const graphqlQuery = {
-//     query: `
-//             {
-//                 getWeather(latitude:"37.4999", longitude:"127.0374") {
-//                     city
-//                 country
-//                 weathers{
-//                   time
-//                   temp
-//                   feels_like
-//                   condition
-//                 }
-//               }
-//             }
-//                 `
-//   };
-
-//   fetch('http://localhost:4000/graphql', {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json'
-//     },
-//     body: JSON.stringify(graphqlQuery)
-//   })
-//     .then((res) => {
-//       return res.json();
-//     })
-//     .then((resData) => {
-//       if (resData.errors) {
-//         throw new Error('에러');
-//       }
-//       console.log(resData);
-//       return (
-//         <Modal>
-//           <Content>
-//             <h3>hi</h3>
-//             <h4>{time}</h4>
-//             <h4>{feels_like}</h4>
-//             <button onClick={onClose}>닫기</button>
-//           </Content>
-//         </Modal>
-//       );
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//     });
-// };
-// 1587999600
+import Socket from 'socket.io-client';
 
 class Detail extends Component {
   state = {
@@ -63,8 +14,8 @@ class Detail extends Component {
   getClothes = () => {
     const graphqlQuery = {
       query: `
-        query getClotesData($temp: Float!){
-            getClothes(temp: $temp) {
+        query getClotesData($temp: Float!, $time: String!, $city: String!){
+            getClothes(temp: $temp, time: $time, city: $city) {
               outer{
                 name
               }
@@ -73,7 +24,9 @@ class Detail extends Component {
           }      
     `,
       variables: {
-        temp: this.props.feels_like
+        temp: this.props.feels_like,
+        time: new Date(),
+        city: this.props.city
       }
     };
 
@@ -113,6 +66,36 @@ class Detail extends Component {
 
   componentDidMount = () => {
     this.getClothes();
+    // 배포할때 포트 바꿔주기
+    const socket = Socket('http://localhost:4000');
+    socket.on('liked', (data) => {
+      if (data.action === 'liked!') {
+        console.log(data);
+      }
+    });
+  };
+
+  // 좋아요 구현
+
+  clickLike = (type, e) => {
+    // 도시 날짜 옷 타입 식별자 만들기
+    const city = this.props.city;
+    const timeStamp = new Date();
+    const year = timeStamp.getFullYear();
+    const month = timeStamp.getMonth() + 1;
+    const date = timeStamp.getDate();
+    const time = year.toString() + month.toString() + date.toString();
+
+    // 로컬스토리지에 있는지 체크
+    // if (localStorage.getItem(`${city}-${time}-${type}`) === 'true') {
+    alert('이미 좋아요를 눌렀습니다.');
+    // } else {
+    // 로컬스토리지에 like 한번만 하게 정보 저장하기
+    localStorage.setItem(`${city}-${time}-${type}`, 'true');
+    // socket.io로 좋아요 늘리기
+    const socket = Socket.connect('http://localhost:4000');
+    socket.emit('liked', { data: 'liked!!!!!!' });
+    // }
   };
 
   render() {
@@ -151,30 +134,37 @@ class Detail extends Component {
                 <TabPanel value={this.state.value} index={0}>
                   <ClothesItemContainer>
                     {this.state.resData.data.getClothes.outer.map((d) => {
-                      return <ClothesItem>{d.name}</ClothesItem>;
+                      return (
+                        <ClothesItem key={d.name}>
+                          {d.name}-{' '}
+                          <button onClick={(e) => this.clickLike('outer', e)}>
+                            좋아요
+                          </button>
+                        </ClothesItem>
+                      );
                     })}
                   </ClothesItemContainer>
                 </TabPanel>
 
                 <TabPanel value={this.state.value} index={1}>
                   <ClothesItemContainer>
-                    {this.state.resData.data.getClothes.outer.map((d) => {
+                    {/* {this.state.resData.data.getClothes.outer.map((d) => {
                       return <ClothesItem>{d.name}</ClothesItem>;
-                    })}
+                    })} */}
                   </ClothesItemContainer>
                 </TabPanel>
                 <TabPanel value={this.state.value} index={2}>
                   <ClothesItemContainer>
-                    {this.state.resData.data.getClothes.outer.map((d) => {
+                    {/* {this.state.resData.data.getClothes.outer.map((d) => {
                       return <ClothesItem>{d.name}</ClothesItem>;
-                    })}
+                    })} */}
                   </ClothesItemContainer>
                 </TabPanel>
                 <TabPanel value={this.state.value} index={3}>
                   <ClothesItemContainer>
-                    {this.state.resData.data.getClothes.outer.map((d) => {
+                    {/* {this.state.resData.data.getClothes.outer.map((d) => {
                       return <ClothesItem>{d.name}</ClothesItem>;
-                    })}
+                    })} */}
                   </ClothesItemContainer>
                 </TabPanel>
               </Clothes>

@@ -83,14 +83,11 @@ class Foot extends Component {
   };
 
   // 3. 클릭하면 도시 변경하기
-  selectCity = (city, e) => {
+  selectCity = (d, e) => {
     this.setState({
       searchedCity: []
     });
-    this.props.getWeather(
-      this.state.searchedCity.coord.lat,
-      this.state.searchedCity.coord.lon
-    );
+    this.props.getWeather(d.coord.lat.toString(), d.coord.lon.toString());
     alert('위치가 변경되었습니다!');
 
     // console.log(city);

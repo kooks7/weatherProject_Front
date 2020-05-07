@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
-import openSocket from 'socket.io-client';
 
 import Forecast from '../components/Forecast';
 import ForecastDetail from '../components/ForecastDetail';
@@ -110,21 +109,12 @@ class Home extends Component {
     }
   };
 
-  // 3. 함수 : 옷 가져오는 함수
-  getClothes = () => {
-    // 1. 해당 온도 가져오기
-    // 2. 온도 붙여서 쿼리 보내주기
-    // 3. 쿼리 결과 받아와서 type별로 정렬하기
-    // 4. 렌더링 하기
-  };
-
   // 4. 함수 : 검색 기능
 
   componentDidMount() {
     if (!this.state.coord.latitude) {
       this.getLocation();
     }
-    const socket = openSocket('http://localhost:4000');
   }
   componentDidUpdate() {
     if (!this.state.coord.latitude) {

@@ -8,7 +8,16 @@ class Detail extends Component {
   state = {
     isLoading: true,
     resData: Array,
-    value: 0
+    value: 0,
+    city: this.props.city,
+    time: () => {
+      const timeStamp = new Date();
+      const year = timeStamp.getFullYear();
+      const month = timeStamp.getMonth() + 1;
+      const date = timeStamp.getDate();
+      const time = year.toString() + month.toString() + date.toString();
+      return time;
+    }
   };
 
   getClothes = () => {
@@ -17,7 +26,16 @@ class Detail extends Component {
         query getClotesData($temp: Float!, $time: String!, $city: String!){
             getClothes(temp: $temp, time: $time, city: $city) {
               outer{
+                _id
                 name
+                like
+                unlike
+              }
+              top{
+                _id
+                name
+                like
+                unlike
               }
               
             }
@@ -64,38 +82,53 @@ class Detail extends Component {
     this.setState({ value: newValue });
   };
 
+  updateLike = (res) => {
+    const {
+      resData: {
+        data: { getClothes }
+      }
+    } = this.state;
+    for (let i = 0; i < getClothes[res.type].length; i++) {
+      if (getClothes[res.type][i]._id === res.updateResult) {
+        this.setState((prevState) => {
+          const updateData = prevState.resData;
+          console.log(updateData);
+          updateData.data.getClothes[res.type][i][res.action]++;
+          return { resData: updateData };
+        });
+      }
+    }
+  };
+
   componentDidMount = () => {
     this.getClothes();
     // 배포할때 포트 바꿔주기
     const socket = Socket('http://localhost:4000');
-    socket.on('liked', (data) => {
-      if (data.action === 'liked!') {
-        console.log(data);
-      }
+    // update 대기
+    socket.on(`${this.state.city}-${this.state.time()}`, (res) => {
+      console.log(res.action);
+      this.updateLike(res);
     });
   };
 
   // 좋아요 구현
 
-  clickLike = (type, e) => {
+  clickLike = (type, liked, _id, e) => {
     // 도시 날짜 옷 타입 식별자 만들기
-    const city = this.props.city;
-    const timeStamp = new Date();
-    const year = timeStamp.getFullYear();
-    const month = timeStamp.getMonth() + 1;
-    const date = timeStamp.getDate();
-    const time = year.toString() + month.toString() + date.toString();
-
     // 로컬스토리지에 있는지 체크
     // if (localStorage.getItem(`${city}-${time}-${type}`) === 'true') {
-    alert('이미 좋아요를 눌렀습니다.');
+    // alert('이미 좋아요를 눌렀습니다.');
     // } else {
     // 로컬스토리지에 like 한번만 하게 정보 저장하기
+    const { city, time } = this.state;
     localStorage.setItem(`${city}-${time}-${type}`, 'true');
     // socket.io로 좋아요 늘리기
     const socket = Socket.connect('http://localhost:4000');
-    socket.emit('liked', { data: 'liked!!!!!!' });
-    // }
+
+    socket.emit('liked', {
+      action: liked,
+      data: `${city}-${time()}-${type}-${_id}_${liked}`
+    });
   };
 
   render() {
@@ -135,10 +168,21 @@ class Detail extends Component {
                   <ClothesItemContainer>
                     {this.state.resData.data.getClothes.outer.map((d) => {
                       return (
-                        <ClothesItem key={d.name}>
-                          {d.name}-{' '}
-                          <button onClick={(e) => this.clickLike('outer', e)}>
+                        <ClothesItem key={d._id}>
+                          {d.name}- {d.like} - {d.unlike}
+                          <button
+                            onClick={(e) =>
+                              this.clickLike('outer', 'like', d._id, e)
+                            }
+                          >
                             좋아요
+                          </button>
+                          <button
+                            onClick={(e) =>
+                              this.clickLike('outer', 'unlike', d._id, e)
+                            }
+                          >
+                            별루
                           </button>
                         </ClothesItem>
                       );
@@ -148,9 +192,27 @@ class Detail extends Component {
 
                 <TabPanel value={this.state.value} index={1}>
                   <ClothesItemContainer>
-                    {/* {this.state.resData.data.getClothes.outer.map((d) => {
-                      return <ClothesItem>{d.name}</ClothesItem>;
-                    })} */}
+                    {this.state.resData.data.getClothes.top.map((d) => {
+                      return (
+                        <ClothesItem key={d._id}>
+                          {d.name}-{d.like} - {d.unlike}
+                          <button
+                            onClick={(e) =>
+                              this.clickLike('top', 'like', d._id, e)
+                            }
+                          >
+                            좋아요
+                          </button>
+                          <button
+                            onClick={(e) =>
+                              this.clickLike('top', 'unlike', d._id, e)
+                            }
+                          >
+                            별루
+                          </button>
+                        </ClothesItem>
+                      );
+                    })}
                   </ClothesItemContainer>
                 </TabPanel>
                 <TabPanel value={this.state.value} index={2}>

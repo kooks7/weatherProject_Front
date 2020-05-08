@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
-
+import Socket from 'socket.io-client';
 import Forecast from '../components/Forecast';
 import ForecastDetail from '../components/ForecastDetail';
 import Foot from '../components/Foot';
@@ -115,6 +115,12 @@ class Home extends Component {
     if (!this.state.coord.latitude) {
       this.getLocation();
     }
+    const socket = Socket('http://localhost:4000');
+    socket.on('like', (res) => {
+      console.log(res);
+      if (res.action === 'updateLike') {
+      }
+    });
   }
   componentDidUpdate() {
     if (!this.state.coord.latitude) {

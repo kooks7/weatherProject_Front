@@ -37,7 +37,18 @@ class Detail extends Component {
                 like
                 unlike
               }
-              
+              bottom{
+                _id
+                name
+                like
+                unlike
+              }
+              acc{
+                _id
+                name
+                like
+                unlike
+              }
             }
           }      
     `,
@@ -217,16 +228,52 @@ class Detail extends Component {
                 </TabPanel>
                 <TabPanel value={this.state.value} index={2}>
                   <ClothesItemContainer>
-                    {/* {this.state.resData.data.getClothes.outer.map((d) => {
-                      return <ClothesItem>{d.name}</ClothesItem>;
-                    })} */}
+                    {this.state.resData.data.getClothes.bottom.map((d) => {
+                      return (
+                        <ClothesItem key={d._id}>
+                          {d.name}-{d.like} - {d.unlike}
+                          <button
+                            onClick={(e) =>
+                              this.clickLike('bottom', 'like', d._id, e)
+                            }
+                          >
+                            좋아요
+                          </button>
+                          <button
+                            onClick={(e) =>
+                              this.clickLike('bottom', 'unlike', d._id, e)
+                            }
+                          >
+                            별루
+                          </button>
+                        </ClothesItem>
+                      );
+                    })}
                   </ClothesItemContainer>
                 </TabPanel>
                 <TabPanel value={this.state.value} index={3}>
                   <ClothesItemContainer>
-                    {/* {this.state.resData.data.getClothes.outer.map((d) => {
-                      return <ClothesItem>{d.name}</ClothesItem>;
-                    })} */}
+                    {this.state.resData.data.getClothes.acc.map((d) => {
+                      return (
+                        <ClothesItem key={d._id}>
+                          {d.name}-{d.like} - {d.unlike}
+                          <button
+                            onClick={(e) =>
+                              this.clickLike('acc', 'like', d._id, e)
+                            }
+                          >
+                            좋아요
+                          </button>
+                          <button
+                            onClick={(e) =>
+                              this.clickLike('acc', 'unlike', d._id, e)
+                            }
+                          >
+                            별루
+                          </button>
+                        </ClothesItem>
+                      );
+                    })}
                   </ClothesItemContainer>
                 </TabPanel>
               </Clothes>

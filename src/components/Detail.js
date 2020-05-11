@@ -9,8 +9,7 @@ class Detail extends Component {
     isLoading: true,
     resData: Array,
     value: 0,
-    city: this.props.city,
-    time: () => {
+    getTime: () => {
       const timeStamp = new Date();
       const year = timeStamp.getFullYear();
       const month = timeStamp.getMonth() + 1;
@@ -59,7 +58,7 @@ class Detail extends Component {
       }
     };
 
-    fetch('http://localhost:4000/graphql', {
+    fetch('http://192.168.43.243:4000/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -103,9 +102,23 @@ class Detail extends Component {
       if (getClothes[res.type][i]._id === res.updateResult) {
         this.setState((prevState) => {
           const updateData = prevState.resData;
-          console.log(updateData);
-          updateData.data.getClothes[res.type][i][res.action]++;
-          return { resData: updateData };
+          // 한번 누른거면
+          if (res.action === 'like') {
+            if (!res.alreadyClicked) {
+              updateData.data.getClothes[res.type][i][res.action]++;
+            } else if (res.alreadyClicked) {
+              updateData.data.getClothes[res.type][i][res.action]--;
+            }
+            return { resData: updateData };
+            // 누른적 있으면
+          } else if (res.action === 'unlike') {
+            if (!res.alreadyClicked) {
+              updateData.data.getClothes[res.type][i][res.action]++;
+            } else if (res.alreadyClicked) {
+              updateData.data.getClothes[res.type][i][res.action]--;
+            }
+            return { resData: updateData };
+          }
         });
       }
     }
@@ -114,10 +127,10 @@ class Detail extends Component {
   componentDidMount = () => {
     this.getClothes();
     // 배포할때 포트 바꿔주기
-    const socket = Socket('http://localhost:4000');
+    const socket = Socket('http://192.168.43.243:4000');
     // update 대기
-    socket.on(`${this.state.city}-${this.state.time()}`, (res) => {
-      console.log(res.action);
+    socket.on(`${this.props.city}-${this.state.getTime()}`, (res) => {
+      console.log(res);
       this.updateLike(res);
     });
   };
@@ -125,26 +138,53 @@ class Detail extends Component {
   // 좋아요 구현
 
   clickLike = (type, liked, _id, e) => {
+    const { getTime } = this.state;
+    const { city } = this.props;
+    const socket = Socket.connect('http://192.168.43.243:4000');
     // 도시 날짜 옷 타입 식별자 만들기
     // 로컬스토리지에 있는지 체크
-    // if (localStorage.getItem(`${city}-${time}-${type}`) === 'true') {
-    // alert('이미 좋아요를 눌렀습니다.');
-    // } else {
+    // liked : 1. like 이전에 좋아요 누른적 없음 2. unlike 이전에 별로에요 누른적 없음
+    // 3. alreadyLike 이전에 좋아요 누른적 있음 해제 3. alreadUnlike
+
+    // 특정 아이템 누른적 있으면 좋아요 해제 하기
+    if (
+      localStorage.getItem(`${city}-${getTime()}-${_id}-${liked}`) === 'true'
+    ) {
+      // 좋아요 감수시키고,
+      console.log('통과~~~');
+      socket.emit('liked', {
+        action: liked,
+        data: `${city}-${getTime()}-${type}-${_id}_${liked}`,
+        alreadyClicked: true
+      });
+      // 좋아요 이력 지우기
+      localStorage.removeItem(`${city}-${getTime()}-${_id}-${liked}`);
+      localStorage.removeItem(`${city}-${getTime()}-${type}`);
+      return;
+    } else if (
+      localStorage.getItem(`${city}-${getTime()}-${type}`) === 'true'
+    ) {
+      alert('이미 좋아요를 눌렀습니다.');
+      return;
+    }
+
     // 로컬스토리지에 like 한번만 하게 정보 저장하기
-    const { city, time } = this.state;
-    localStorage.setItem(`${city}-${time}-${type}`, 'true');
+    // 특정 아이템 누른적 있는지
+    localStorage.setItem(`${city}-${getTime()}-${_id}-${liked}`, 'true');
+    // 타입 누른적 있는지
+    localStorage.setItem(`${city}-${getTime()}-${type}`, 'true');
     // socket.io로 좋아요 늘리기
-    const socket = Socket.connect('http://localhost:4000');
 
     socket.emit('liked', {
       action: liked,
-      data: `${city}-${time()}-${type}-${_id}_${liked}`
+      data: `${city}-${getTime()}-${type}-${_id}_${liked}`,
+      alreadyClicked: false
     });
   };
 
   render() {
     const { time, feels_like, onClose, city, country } = this.props;
-    const { isLoading } = this.state;
+    const { isLoading, getTime } = this.state;
     return (
       <div>
         {isLoading ? (
@@ -164,11 +204,7 @@ class Detail extends Component {
 
               <Clothes>
                 <AppBar position="static">
-                  <Tabs
-                    value={this.state.value}
-                    onChange={this.handleChange}
-                    aria-label="simple tabs example"
-                  >
+                  <Tabs value={this.state.value} onChange={this.handleChange}>
                     <Tab label="Outer" {...this.a11yProps(0)} />
                     <Tab label="Top" {...this.a11yProps(1)} />
                     <Tab label="Bottom" {...this.a11yProps(2)} />
@@ -180,21 +216,38 @@ class Detail extends Component {
                     {this.state.resData.data.getClothes.outer.map((d) => {
                       return (
                         <ClothesItem key={d._id}>
-                          {d.name}- {d.like} - {d.unlike}
-                          <button
-                            onClick={(e) =>
-                              this.clickLike('outer', 'like', d._id, e)
-                            }
-                          >
-                            좋아요
-                          </button>
-                          <button
-                            onClick={(e) =>
-                              this.clickLike('outer', 'unlike', d._id, e)
-                            }
-                          >
-                            별루
-                          </button>
+                          <ClothesName>{d.name}</ClothesName>
+                          <ClothesLikeDiv>
+                            <ClothesLike>
+                              좋아요:{d.like}
+                              <ClothesLikeBtn
+                                onClick={(e) =>
+                                  this.clickLike('outer', 'like', d._id, e)
+                                }
+                              >
+                                {' '}
+                                {localStorage.getItem(
+                                  `${city}-${getTime()}-${d._id}-like`
+                                )
+                                  ? '★'
+                                  : '☆'}
+                              </ClothesLikeBtn>
+                            </ClothesLike>
+                            <ClothesLike>
+                              별로에요:{d.unlike}
+                              <ClothesLikeBtn
+                                onClick={(e) =>
+                                  this.clickLike('outer', 'unlike', d._id, e)
+                                }
+                              >
+                                {localStorage.getItem(
+                                  `${city}-${getTime()}-${d._id}-unlike`
+                                )
+                                  ? '★'
+                                  : '☆'}
+                              </ClothesLikeBtn>
+                            </ClothesLike>{' '}
+                          </ClothesLikeDiv>
                         </ClothesItem>
                       );
                     })}
@@ -206,21 +259,38 @@ class Detail extends Component {
                     {this.state.resData.data.getClothes.top.map((d) => {
                       return (
                         <ClothesItem key={d._id}>
-                          {d.name}-{d.like} - {d.unlike}
-                          <button
-                            onClick={(e) =>
-                              this.clickLike('top', 'like', d._id, e)
-                            }
-                          >
-                            좋아요
-                          </button>
-                          <button
-                            onClick={(e) =>
-                              this.clickLike('top', 'unlike', d._id, e)
-                            }
-                          >
-                            별루
-                          </button>
+                          <ClothesName>{d.name}</ClothesName>
+                          <ClothesLikeDiv>
+                            <ClothesLike>
+                              좋아요:{d.like}
+                              <ClothesLikeBtn
+                                onClick={(e) =>
+                                  this.clickLike('top', 'like', d._id, e)
+                                }
+                              >
+                                {' '}
+                                {localStorage.getItem(
+                                  `${city}-${getTime()}-${d._id}-like`
+                                )
+                                  ? '★'
+                                  : '☆'}
+                              </ClothesLikeBtn>
+                            </ClothesLike>
+                            <ClothesLike>
+                              별로에요:{d.unlike}
+                              <ClothesLikeBtn
+                                onClick={(e) =>
+                                  this.clickLike('top', 'unlike', d._id, e)
+                                }
+                              >
+                                {localStorage.getItem(
+                                  `${city}-${getTime()}-${d._id}-unlike`
+                                )
+                                  ? '★'
+                                  : '☆'}
+                              </ClothesLikeBtn>
+                            </ClothesLike>{' '}
+                          </ClothesLikeDiv>
                         </ClothesItem>
                       );
                     })}
@@ -231,21 +301,38 @@ class Detail extends Component {
                     {this.state.resData.data.getClothes.bottom.map((d) => {
                       return (
                         <ClothesItem key={d._id}>
-                          {d.name}-{d.like} - {d.unlike}
-                          <button
-                            onClick={(e) =>
-                              this.clickLike('bottom', 'like', d._id, e)
-                            }
-                          >
-                            좋아요
-                          </button>
-                          <button
-                            onClick={(e) =>
-                              this.clickLike('bottom', 'unlike', d._id, e)
-                            }
-                          >
-                            별루
-                          </button>
+                          <ClothesName>{d.name}</ClothesName>
+                          <ClothesLikeDiv>
+                            <ClothesLike>
+                              좋아요:{d.like}
+                              <ClothesLikeBtn
+                                onClick={(e) =>
+                                  this.clickLike('bottom', 'like', d._id, e)
+                                }
+                              >
+                                {' '}
+                                {localStorage.getItem(
+                                  `${city}-${getTime()}-${d._id}-like`
+                                )
+                                  ? '★'
+                                  : '☆'}
+                              </ClothesLikeBtn>
+                            </ClothesLike>
+                            <ClothesLike>
+                              별로에요:{d.unlike}
+                              <ClothesLikeBtn
+                                onClick={(e) =>
+                                  this.clickLike('bottom', 'unlike', d._id, e)
+                                }
+                              >
+                                {localStorage.getItem(
+                                  `${city}-${getTime()}-${d._id}-unlike`
+                                )
+                                  ? '★'
+                                  : '☆'}
+                              </ClothesLikeBtn>
+                            </ClothesLike>{' '}
+                          </ClothesLikeDiv>
                         </ClothesItem>
                       );
                     })}
@@ -256,21 +343,38 @@ class Detail extends Component {
                     {this.state.resData.data.getClothes.acc.map((d) => {
                       return (
                         <ClothesItem key={d._id}>
-                          {d.name}-{d.like} - {d.unlike}
-                          <button
-                            onClick={(e) =>
-                              this.clickLike('acc', 'like', d._id, e)
-                            }
-                          >
-                            좋아요
-                          </button>
-                          <button
-                            onClick={(e) =>
-                              this.clickLike('acc', 'unlike', d._id, e)
-                            }
-                          >
-                            별루
-                          </button>
+                          <ClothesName>{d.name}</ClothesName>
+                          <ClothesLikeDiv>
+                            <ClothesLike>
+                              좋아요:{d.like}
+                              <ClothesLikeBtn
+                                onClick={(e) =>
+                                  this.clickLike('acc', 'like', d._id, e)
+                                }
+                              >
+                                {' '}
+                                {localStorage.getItem(
+                                  `${city}-${getTime()}-${d._id}-like`
+                                )
+                                  ? '★'
+                                  : '☆'}
+                              </ClothesLikeBtn>
+                            </ClothesLike>
+                            <ClothesLike>
+                              별로에요:{d.unlike}
+                              <ClothesLikeBtn
+                                onClick={(e) =>
+                                  this.clickLike('acc', 'unlike', d._id, e)
+                                }
+                              >
+                                {localStorage.getItem(
+                                  `${city}-${getTime()}-${d._id}-unlike`
+                                )
+                                  ? '★'
+                                  : '☆'}
+                              </ClothesLikeBtn>
+                            </ClothesLike>{' '}
+                          </ClothesLikeDiv>
                         </ClothesItem>
                       );
                     })}
@@ -303,19 +407,17 @@ const Modal = styled.div`
   /* display: flex; */
   /* flex-direction: column; */
   padding: 2em;
-  max-width: 50%;
-  max-height: 60%;
+  width: 85rem;
+  height: 43rem;
   color: black;
   background-color: #fff;
   border-radius: 1em;
   transform: translate(-50%, -50%);
   outline: transparent;
-
-  /* width: 50%; */
 `;
 const Content = styled.div`
   display: flex;
-  margin-bottom: 3px;
+  margin-top: 3px;
   border-bottom: 0.5px solid rgba(200, 200, 200, 0.9);
 `;
 
@@ -329,20 +431,41 @@ const Clothes = styled.div`
 `;
 const ClothesItemContainer = styled.div`
   display: flex;
-  flex-direction: column;
   flex-wrap: wrap;
-  max-width: 20rem;
-  max-height: 30rem;
-  justify-content: space-around;
+  padding-top: 20px;
+  width: 83rem;
+  height: 30rem;
+  /* min-height: 20rem; */
+  justify-content: flex-start;
   align-content: space-around;
-  margin-left: 2rem;
+  /* margin-left: 2rem; */
 `;
 
-const ClothesItem = styled.p`
+const ClothesItem = styled.div`
   padding: 10px;
   margin: 10px;
   border: 0.5px solid rgba(200, 200, 200, 0.9);
   border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  width: 9rem;
+  height: 9.5rem;
+`;
+const ClothesName = styled.div`
+  font-size: 20px;
+  font-weight: 600;
+  margin: 20px 0 20px 0;
+  text-align: center;
+`;
+const ClothesLike = styled.div``;
+
+const ClothesLikeDiv = styled.div`
+  display: flex;
+`;
+
+const ClothesLikeBtn = styled.button`
+  border: none;
+  background-color: none;
 `;
 
 const ModalCloseBtn = styled.button`

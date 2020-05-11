@@ -50,7 +50,7 @@ class Home extends Component {
       }
     };
 
-    fetch('http://localhost:4000/graphql', {
+    fetch('http://192.168.43.243:4000/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -95,7 +95,15 @@ class Home extends Component {
             position.coords.longitude.toString()
           );
         },
-        function (error) {
+        (error) => {
+          this.setState({
+            coord: {
+              latitude: '37.5665',
+              longitude: '126.9'
+            }
+          });
+          this.getWeather('37.5665', '126.9');
+          alert('위치 정보를 받아올 수 없습니다. - 기본 위치로 설정 : 서울 ');
           console.error(error);
         },
         {
@@ -115,7 +123,7 @@ class Home extends Component {
     if (!this.state.coord.latitude) {
       this.getLocation();
     }
-    const socket = Socket('http://localhost:4000');
+    const socket = Socket('http://192.168.43.243:4000');
     socket.on('like', (res) => {
       console.log(res);
       if (res.action === 'updateLike') {
@@ -176,7 +184,7 @@ body{
   position: relative;
   font-family: Nanum Gothic, sans-serif; 
   color: white;
-  background: url(http://localhost:3000/sky.jpg);
+  background: url(http://192.168.43.243:3000/sky.jpg);
   background-size : cover;
   height: 100%;
   overflow: hidden;

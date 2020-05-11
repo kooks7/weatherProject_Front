@@ -38,7 +38,7 @@ class Foot extends Component {
       }
     };
 
-    fetch('http://localhost:4000/graphql', {
+    fetch('http://192.168.43.243:4000/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -109,7 +109,7 @@ class Foot extends Component {
     // };
 
     // // 1. 선택한 도시로 쿼리 보내기
-    // fetch('http://localhost:4000/graphql', {
+    // fetch('http://192.168.43.243:4000/graphql', {
     //   method: 'POST',
     //   headers: {
     //     'Content-Type': 'application/json'

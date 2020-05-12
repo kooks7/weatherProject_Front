@@ -20,11 +20,11 @@ const Container = styled.div`
 const Link = styled.a``;
 
 const Idiv = styled.div`
-  font-size: 6.5em;
+  font-size: 8em;
   margin-top: 20px;
 `;
 const Time = styled.h2`
-  font-size: 20px;
+  font-size: 17px;
 `;
 const Temp = styled.h3`
   font-size: 40x;
@@ -64,15 +64,15 @@ class Forecast extends Component {
     const timeObj = {
       Month: timeData.getMonth() + 1,
       Date: timeData.getDate(),
+      Day: timeData.getDay(),
       Time: timeData.toLocaleTimeString().split(':')
     };
-
-    // <Modal onClick={this.handleOpenModal}>출격가능</Modal>
-
+    console.log(timeObj);
     return (
       <>
         <Container onClick={this.handleOpenModal}>
           <Link>
+            <Time>{chnageDay[timeObj.Day] + ' ' + timeObj.Date}</Time>
             <Time>{timeObj.Time[0] + ':' + timeObj.Time[2]}</Time>
             <Idiv>
               <Icon />
@@ -88,7 +88,15 @@ class Forecast extends Component {
               city={city}
               id={id}
               onClose={this.handleCloseModal}
-              time={timeObj.Time[0] + ':' + timeObj.Time[2]}
+              time={
+                chnageDay[timeObj.Day] +
+                '요일 ' +
+                timeObj.Date +
+                '일 ' +
+                timeObj.Time[0] +
+                ':' +
+                timeObj.Time[2]
+              }
               temp={temp}
               feels_like={feels_like}
             />
@@ -142,6 +150,16 @@ const weatherOptions = {
     kor: '구름',
     subtitle: '구름낀 날씨입니다.'
   }
+};
+
+const chnageDay = {
+  '1': '월',
+  '2': '화',
+  '3': '수',
+  '4': '목',
+  '5': '금',
+  '6': '토',
+  '7': '일'
 };
 
 export default Forecast;

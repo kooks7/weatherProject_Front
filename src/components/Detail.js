@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { AppBar, Tabs, Tab } from '@material-ui/core';
 import TabPanel from './TabPanel';
+import PropTypes from 'prop-types';
 import Socket from 'socket.io-client';
 
 class Detail extends Component {
@@ -58,7 +59,7 @@ class Detail extends Component {
       }
     };
 
-    fetch('http://192.168.43.243:4000/graphql', {
+    fetch('http://localhost:4000/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -127,7 +128,7 @@ class Detail extends Component {
   componentDidMount = () => {
     this.getClothes();
     // 배포할때 포트 바꿔주기
-    const socket = Socket('http://192.168.43.243:4000');
+    const socket = Socket('http://localhost:4000');
     // update 대기
     socket.on(`${this.props.city}-${this.state.getTime()}`, (res) => {
       console.log(res);
@@ -140,7 +141,7 @@ class Detail extends Component {
   clickLike = (type, liked, _id, e) => {
     const { getTime } = this.state;
     const { city } = this.props;
-    const socket = Socket.connect('http://192.168.43.243:4000');
+    const socket = Socket.connect('http://localhost:4000');
     // 도시 날짜 옷 타입 식별자 만들기
     // 로컬스토리지에 있는지 체크
     // liked : 1. like 이전에 좋아요 누른적 없음 2. unlike 이전에 별로에요 누른적 없음
@@ -151,7 +152,6 @@ class Detail extends Component {
       localStorage.getItem(`${city}-${getTime()}-${_id}-${liked}`) === 'true'
     ) {
       // 좋아요 감수시키고,
-      console.log('통과~~~');
       socket.emit('liked', {
         action: liked,
         data: `${city}-${getTime()}-${type}-${_id}_${liked}`,
@@ -164,7 +164,7 @@ class Detail extends Component {
     } else if (
       localStorage.getItem(`${city}-${getTime()}-${type}`) === 'true'
     ) {
-      alert('이미 좋아요를 눌렀습니다.');
+      alert(`${type}에 이미 좋아요를 눌렀습니다.`);
       return;
     }
 
@@ -196,13 +196,13 @@ class Detail extends Component {
             <ModalContainer onClick={onClose}></ModalContainer>
             <Modal>
               <Content>
-                <h4>{time}</h4>
+                <h4>{time} </h4>
                 <h3>{country} ,</h3>
-                <h3>{city}의 현재 날씨</h3>
-                <h4> 체감온도: {feels_like}</h4>
+                <h3>{city} 의 출격 명령</h3>
+                <h4> 체감온도: {feels_like}°C</h4>
               </Content>
 
-              <Clothes>
+              <>
                 <AppBar position="static">
                   <Tabs value={this.state.value} onChange={this.handleChange}>
                     <Tab label="Outer" {...this.a11yProps(0)} />
@@ -219,7 +219,8 @@ class Detail extends Component {
                           <ClothesName>{d.name}</ClothesName>
                           <ClothesLikeDiv>
                             <ClothesLike>
-                              좋아요:{d.like}
+                              좋아요
+                              <ClothesLikeNum>{d.like}명</ClothesLikeNum>
                               <ClothesLikeBtn
                                 onClick={(e) =>
                                   this.clickLike('outer', 'like', d._id, e)
@@ -234,7 +235,8 @@ class Detail extends Component {
                               </ClothesLikeBtn>
                             </ClothesLike>
                             <ClothesLike>
-                              별로에요:{d.unlike}
+                              별로에요
+                              <ClothesLikeNum>{d.unlike}명</ClothesLikeNum>
                               <ClothesLikeBtn
                                 onClick={(e) =>
                                   this.clickLike('outer', 'unlike', d._id, e)
@@ -380,7 +382,7 @@ class Detail extends Component {
                     })}
                   </ClothesItemContainer>
                 </TabPanel>
-              </Clothes>
+              </>
               <ModalCloseBtn onClick={onClose}>Close</ModalCloseBtn>
             </Modal>
           </>
@@ -417,28 +419,20 @@ const Modal = styled.div`
 `;
 const Content = styled.div`
   display: flex;
-  margin-top: 3px;
+  * {
+    margin: 10px 5px 10px;
+  }
   border-bottom: 0.5px solid rgba(200, 200, 200, 0.9);
 `;
 
-const Clothes = styled.div`
-  /* display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  align-content: space-around;
-  max-height: 50%; */
-`;
 const ClothesItemContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   padding-top: 20px;
   width: 83rem;
   height: 30rem;
-  /* min-height: 20rem; */
   justify-content: flex-start;
   align-content: space-around;
-  /* margin-left: 2rem; */
 `;
 
 const ClothesItem = styled.div`
@@ -450,22 +444,35 @@ const ClothesItem = styled.div`
   flex-direction: column;
   width: 9rem;
   height: 9.5rem;
+  box-shadow: 1px 1px 0px 0px rgba(200, 200, 200, 0.5);
 `;
+
 const ClothesName = styled.div`
   font-size: 20px;
   font-weight: 600;
-  margin: 20px 0 20px 0;
+  size: 20px;
   text-align: center;
+  margin-bottom: auto;
 `;
-const ClothesLike = styled.div``;
-
 const ClothesLikeDiv = styled.div`
   display: flex;
+  flex-direction: column;
+  margin-top: auto;
+`;
+const ClothesLike = styled.div`
+  font-size: 12px;
+  display: flex;
+  align-items: baseline;
+`;
+
+const ClothesLikeNum = styled.p`
+  font-weight: 700;
 `;
 
 const ClothesLikeBtn = styled.button`
   border: none;
-  background-color: none;
+  background: none;
+  font-size: 17px;
 `;
 
 const ModalCloseBtn = styled.button`
@@ -479,5 +486,15 @@ const ModalCloseBtn = styled.button`
   color: rgba(220, 220, 220, 1);
   border: 0px;
 `;
+
+Detail.propType = {
+  country: PropTypes.string.isRequired,
+  city: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
+  onClose: PropTypes.func.isRequired,
+  time: PropTypes.string.isRequired,
+  temp: PropTypes.number.isRequired,
+  feels_like: PropTypes.number.isRequired
+};
 
 export default Detail;

@@ -50,7 +50,7 @@ class Home extends Component {
       }
     };
 
-    fetch('http://192.168.43.243:4000/graphql', {
+    fetch('http://localhost:4000/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -69,7 +69,9 @@ class Home extends Component {
           forecastData: resData.data.getWeather,
           isLoading: false
         });
+        console.log(this.state.forecastData);
       })
+
       .catch((err) => {
         console.log(err);
       });
@@ -123,7 +125,7 @@ class Home extends Component {
     if (!this.state.coord.latitude) {
       this.getLocation();
     }
-    const socket = Socket('http://192.168.43.243:4000');
+    const socket = Socket('http://localhost:4000');
     socket.on('like', (res) => {
       console.log(res);
       if (res.action === 'updateLike') {
@@ -146,7 +148,7 @@ class Home extends Component {
           <div> Loding ... </div>
         ) : (
           <Container>
-            <GlobalStyle />
+            <GlobalStyle backgroundImage={forecasts[0].condition} />
             <ForecastDetail
               wind_speed={forecasts[0].wind_speed}
               temp={forecasts[0].temp}
@@ -184,7 +186,8 @@ body{
   position: relative;
   font-family: Nanum Gothic, sans-serif; 
   color: white;
-  background: url(http://192.168.43.243:3000/sky.jpg);
+  background: url(http://localhost:3000/${(props) =>
+    weatherBackgorunds[props.backgroundImage] || 'clean'}.jpg);
   background-size : cover;
   height: 100%;
   overflow: hidden;
@@ -209,5 +212,15 @@ const Body = styled.div`
     flex-direction: column;
   }
 `;
+
+const weatherBackgorunds = {
+  Thunderstorm: 'rainy',
+  Drizzle: 'rainy',
+  Rain: 'rainy',
+  Snow: 'snow',
+  Haze: 'rainy',
+  Clear: 'clean',
+  Clouds: 'cloudy'
+};
 
 export default Home;

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import PropTypes from 'prop-types';
 import ModalPortal from '../components/ModalPortal';
 
 class Foot extends Component {
@@ -38,7 +37,7 @@ class Foot extends Component {
       }
     };
 
-    fetch('http://192.168.43.243:4000/graphql', {
+    fetch('http://localhost:4000/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -89,61 +88,6 @@ class Foot extends Component {
     });
     this.props.getWeather(d.coord.lat.toString(), d.coord.lon.toString());
     alert('위치가 변경되었습니다!');
-
-    // console.log(city);
-    // const graphqlQuery = {
-    //   query: `
-    //   query getSearchingCity($city: String! )
-    //         {
-    //             getCityId(city: $city) {
-    //                coord{
-    //                  lat
-    //                  lon
-    //                }
-    //             }
-    //         }
-    //             `,
-    //   variables: {
-    //     city: city
-    //   }
-    // };
-
-    // // 1. 선택한 도시로 쿼리 보내기
-    // fetch('http://192.168.43.243:4000/graphql', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify(graphqlQuery)
-    // })
-    //   .then((res) => {
-    //     return res.json();
-    //   })
-    //   .then((resData) => {
-    //     if (resData.errors) {
-    //       throw new Error('에러');
-    //     }
-    //     if (!resData.data.getCityId) {
-    //       alert('검색한 도시가 없습니다.');
-    //       return;
-    //     }
-
-    //     this.setState({
-    //       searchedCity: ''
-    //       // coord: {
-    //       //   latitude: resData.data.getCityId[0].coord.lat,
-    //       //   longitude: resData.data.getCityId[0].coord.lon
-    //       // }
-    //     });
-    //     this.props.getWeather(
-    //       resData.data.getCityId.coord.lat,
-    //       resData.data.getCityId.coord.lon
-    //     );
-    //     alert('위치가 변경되었습니다!');
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
   };
   render() {
     const { searchedCity } = this.state;
@@ -165,9 +109,8 @@ class Foot extends Component {
                   <div>
                     <SearchList>
                       {searchedCity.map((d) => {
-                        console.log('d', d);
                         return (
-                          <li>
+                          <li key={d.name}>
                             <SearchRes onClick={(e) => this.selectCity(d, e)}>
                               {d.name}-{d.country}
                             </SearchRes>
@@ -183,15 +126,13 @@ class Foot extends Component {
             </ModalPortal>
           )}
         </SearchingContainer>
-        <ChatContainer>
-          <h1>Chating</h1>
-        </ChatContainer>
+        <AboutContainer>
+          <h1>About</h1>
+        </AboutContainer>
       </Footer>
     );
   }
 }
-
-Foot.propType = {};
 
 const Footer = styled.div`
   position: fixed;
@@ -207,7 +148,6 @@ const Footer = styled.div`
   flex: 1;
   display: flex;
   align-items: center;
-  /* border: 1px solid black; */
 `;
 
 const SearchingContainer = styled.div`
@@ -241,7 +181,7 @@ const SearchList = styled.ul`
   }
 `;
 
-const ChatContainer = styled.div`
+const AboutContainer = styled.div`
   margin-left: auto;
   margin-right: 5rem;
 `;
@@ -254,10 +194,6 @@ const Btn = styled.button`
   background-color: rgba(051, 051, 051, 0.5);
   color: rgba(220, 220, 220, 1);
   border: 0px;
-`;
-
-const Nav = styled.div`
-  /* border: 1px solid black; */
 `;
 
 export default Foot;

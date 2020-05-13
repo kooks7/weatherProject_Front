@@ -183,8 +183,9 @@ body{
   position: relative;
   font-family: Nanum Gothic, sans-serif; 
   color: white;
-  background: url(https://weather-graphql-api.herokuapp.com/weather/${(props) =>
-    weatherBackgorunds[props.backgroundImage] || 'clean'}.jpg);
+  background: url(https://kooks7.github.io/weatherProject_Front/public/${(
+    props
+  ) => weatherBackgorunds[props.backgroundImage] || 'clean'}.jpg);
   background-size : cover;
   height: 100%;
   overflow: hidden;

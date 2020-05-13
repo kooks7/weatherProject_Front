@@ -59,7 +59,7 @@ class Detail extends Component {
       }
     };
 
-    fetch('http://localhost:4000/graphql', {
+    fetch('https://weather-graphql-api.herokuapp.com/weather/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -128,10 +128,9 @@ class Detail extends Component {
   componentDidMount = () => {
     this.getClothes();
     // 배포할때 포트 바꿔주기
-    const socket = Socket('http://localhost:4000');
+    const socket = Socket('https://weather-graphql-api.herokuapp.com/weather');
     // update 대기
     socket.on(`${this.props.city}-${this.state.getTime()}`, (res) => {
-      console.log(res);
       this.updateLike(res);
     });
   };
@@ -141,7 +140,9 @@ class Detail extends Component {
   clickLike = (type, liked, _id, e) => {
     const { getTime } = this.state;
     const { city } = this.props;
-    const socket = Socket.connect('http://localhost:4000');
+    const socket = Socket.connect(
+      'https://weather-graphql-api.herokuapp.com/weather'
+    );
     // 도시 날짜 옷 타입 식별자 만들기
     // 로컬스토리지에 있는지 체크
     // liked : 1. like 이전에 좋아요 누른적 없음 2. unlike 이전에 별로에요 누른적 없음

@@ -37,7 +37,7 @@ class Foot extends Component {
       }
     };
 
-    fetch('http://localhost:4000/graphql', {
+    fetch('https://weather-graphql-api.herokuapp.com/weather/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -51,7 +51,6 @@ class Foot extends Component {
         if (resData.errors) {
           throw new Error('에러');
         }
-        console.log(resData);
         const {
           data: { getCityId }
         } = resData;
@@ -62,7 +61,6 @@ class Foot extends Component {
         this.setState({
           searchedCity: getCityId
         });
-        console.log(this.state);
       })
       .catch((err) => {
         console.log(err);

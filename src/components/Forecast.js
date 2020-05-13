@@ -67,7 +67,6 @@ class Forecast extends Component {
       Day: timeData.getDay(),
       Time: timeData.toLocaleTimeString().split(':')
     };
-    console.log(timeObj);
     return (
       <>
         <Container onClick={this.handleOpenModal}>

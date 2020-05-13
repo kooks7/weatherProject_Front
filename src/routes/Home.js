@@ -21,7 +21,6 @@ class Home extends Component {
     latitude = this.state.coord.latitude,
     longitude = this.state.coord.longitude
   ) => {
-    console.log('실행');
     const graphqlQuery = {
       query: `
       query getWeatherByLocaiton($latitude: String!,$longitude: String! )
@@ -50,7 +49,7 @@ class Home extends Component {
       }
     };
 
-    fetch('http://localhost:4000/graphql', {
+    fetch('https://weather-graphql-api.herokuapp.com/weather/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -69,7 +68,6 @@ class Home extends Component {
           forecastData: resData.data.getWeather,
           isLoading: false
         });
-        console.log(this.state.forecastData);
       })
 
       .catch((err) => {
@@ -125,9 +123,8 @@ class Home extends Component {
     if (!this.state.coord.latitude) {
       this.getLocation();
     }
-    const socket = Socket('http://localhost:4000');
+    const socket = Socket('https://weather-graphql-api.herokuapp.com/weather');
     socket.on('like', (res) => {
-      console.log(res);
       if (res.action === 'updateLike') {
       }
     });
@@ -186,7 +183,7 @@ body{
   position: relative;
   font-family: Nanum Gothic, sans-serif; 
   color: white;
-  background: url(http://localhost:3000/${(props) =>
+  background: url(https://weather-graphql-api.herokuapp.com/weather/${(props) =>
     weatherBackgorunds[props.backgroundImage] || 'clean'}.jpg);
   background-size : cover;
   height: 100%;

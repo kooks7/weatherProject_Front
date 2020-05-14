@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import ModalPortal from '../components/ModalPortal';
+import { isAlphanumeric } from 'validator';
 
 class Foot extends Component {
   state = {
@@ -18,6 +19,10 @@ class Foot extends Component {
   // 2. 폼 제출해서 검색 하기
   citySearching = (e) => {
     e.preventDefault();
+    if (!isAlphanumeric(this.state.keyword)) {
+      alert('특수문자를 빼주세요.');
+      return;
+    }
     const graphqlQuery = {
       query: `
       query getSearchingCity($city: String! )
@@ -36,35 +41,35 @@ class Foot extends Component {
         city: this.state.keyword
       }
     };
-
-    fetch('https://weather-graphql-api.herokuapp.com/weather/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(graphqlQuery)
-    })
-      .then((res) => {
-        return res.json();
+    if (isAlphanumeric(this.state.keyword))
+      fetch('http://https://weather-graphql-api.herokuapp.com/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(graphqlQuery)
       })
-      .then((resData) => {
-        if (resData.errors) {
-          throw new Error('에러');
-        }
-        const {
-          data: { getCityId }
-        } = resData;
-        if (!getCityId) {
-          alert('검색한 도시가 없습니다.');
-          return;
-        }
-        this.setState({
-          searchedCity: getCityId
+        .then((res) => {
+          return res.json();
+        })
+        .then((resData) => {
+          if (resData.errors) {
+            throw new Error('에러');
+          }
+          const {
+            data: { getCityId }
+          } = resData;
+          if (!getCityId) {
+            alert('검색한 도시가 없습니다.');
+            return;
+          }
+          this.setState({
+            searchedCity: getCityId
+          });
+        })
+        .catch((err) => {
+          console.log(err);
         });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
   };
   // modal동작
   handleOpenModal = () => {

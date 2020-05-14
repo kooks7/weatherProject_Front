@@ -49,7 +49,7 @@ class Home extends Component {
       }
     };
 
-    fetch('https://weather-graphql-api.herokuapp.com/weather/graphql', {
+    fetch('http://https://weather-graphql-api.herokuapp.com/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -123,7 +123,7 @@ class Home extends Component {
     if (!this.state.coord.latitude) {
       this.getLocation();
     }
-    const socket = Socket('https://weather-graphql-api.herokuapp.com/weather');
+    const socket = Socket('http://https://weather-graphql-api.herokuapp.com');
     socket.on('like', (res) => {
       if (res.action === 'updateLike') {
       }
@@ -183,9 +183,8 @@ body{
   position: relative;
   font-family: Nanum Gothic, sans-serif; 
   color: white;
-  background: url(https://kooks7.github.io/weatherProject_Front/public/${(
-    props
-  ) => weatherBackgorunds[props.backgroundImage] || 'clean'}.jpg);
+  background: url(https://kooks7.github.io/weatherProject_Front/${(props) =>
+    weatherBackgorunds[props.backgroundImage] || 'clean'}.jpg);
   background-size : cover;
   height: 100%;
   overflow: hidden;

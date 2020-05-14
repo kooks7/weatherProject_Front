@@ -59,7 +59,7 @@ class Detail extends Component {
       }
     };
 
-    fetch('https://weather-graphql-api.herokuapp.com/weather/graphql', {
+    fetch('http://https://weather-graphql-api.herokuapp.com/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -128,7 +128,7 @@ class Detail extends Component {
   componentDidMount = () => {
     this.getClothes();
     // 배포할때 포트 바꿔주기
-    const socket = Socket('https://weather-graphql-api.herokuapp.com/weather');
+    const socket = Socket('http://https://weather-graphql-api.herokuapp.com');
     // update 대기
     socket.on(`${this.props.city}-${this.state.getTime()}`, (res) => {
       this.updateLike(res);
@@ -141,7 +141,7 @@ class Detail extends Component {
     const { getTime } = this.state;
     const { city } = this.props;
     const socket = Socket.connect(
-      'https://weather-graphql-api.herokuapp.com/weather'
+      'http://https://weather-graphql-api.herokuapp.com'
     );
     // 도시 날짜 옷 타입 식별자 만들기
     // 로컬스토리지에 있는지 체크

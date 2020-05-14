@@ -49,7 +49,7 @@ class Home extends Component {
       }
     };
 
-    fetch('http://https://weather-graphql-api.herokuapp.com/graphql', {
+    fetch('https://weather-graphql-api.herokuapp.com/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -123,7 +123,7 @@ class Home extends Component {
     if (!this.state.coord.latitude) {
       this.getLocation();
     }
-    const socket = Socket('http://https://weather-graphql-api.herokuapp.com');
+    const socket = Socket('https://weather-graphql-api.herokuapp.com');
     socket.on('like', (res) => {
       if (res.action === 'updateLike') {
       }

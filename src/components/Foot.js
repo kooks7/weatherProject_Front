@@ -42,7 +42,7 @@ class Foot extends Component {
       }
     };
     if (isAlphanumeric(this.state.keyword))
-      fetch('http://https://weather-graphql-api.herokuapp.com/graphql', {
+      fetch('https://weather-graphql-api.herokuapp.com/graphql', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
